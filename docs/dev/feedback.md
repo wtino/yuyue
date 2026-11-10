@@ -1,6 +1,8 @@
 # 反馈
 
-用户在语阅里写下的反馈，加密后发到公共的 [ntfy.sh](https://ntfy.sh)，由 GitHub Actions 收进私有仓库的 Issue，Mac 开机后再导入本机的 Kaneo。不自建服务器，不花钱。Mac 关机也不影响反馈先被收下：ntfy 和 GitHub 都在云上，Kaneo 只在电脑开着的时候补上。
+这次改动**没有**语阅的界面。SwiftUI 和 Compose 里都没有反馈页，发送和离线队列也不在这次里。界面你自己做。样子留在 [`docs/dev/feedback-prototype/index.html`](feedback-prototype/index.html)，当参照。
+
+这条链路是：反馈加密后发到公共的 [ntfy.sh](https://ntfy.sh)，由 GitHub Actions 收进私有仓库的 Issue，Mac 开机后再导入本机的 Kaneo。不自建服务器，不花钱。Mac 关机也不影响反馈先被收下：ntfy 和 GitHub 都在云上，Kaneo 只在电脑开着的时候补上。
 
 ## 为什么是这条路
 
@@ -8,7 +10,7 @@
 - 没有邮箱、没有 Gitee、没有 Kaneo Cloud、没有 Cloudflare 或国内云。
 - 语阅仓库是公开的（GPL-3.0）。谁知道话题地址，谁都能订阅，所以反馈不能明文发。
 - App 用接收方的公钥做 libsodium sealed box（`crypto_box_seal`，X25519）。私钥只放在 GitHub Actions 的 secret 里。订阅话题的人只能看到密文。
-- 加密写在 Rust core（`core/yuyue-core/src/feedback.rs` 的 `seal_feedback`）。界面还没进 App：样子在 [`docs/dev/feedback-prototype/index.html`](feedback-prototype/index.html)，你点头之后再接到 SwiftUI 和 Compose。各端的发送和「没网先留在本机」也等界面定了再接，不跟界面稿混在一起。
+- 加密在 Rust core：`seal_feedback`（`core/yuyue-core/src/feedback.rs`）。编过 core 之后，Swift 是 `sealFeedback(publicKeyB64:draft:)`，Kotlin 是 `sealFeedback`。入参是 `FeedbackDraft`（`category` 为 `bug` / `idea` / `other`，加上正文、可选联系方式、版本、平台、系统版本）。返回 `v1.` 加 sealed box 的标准 base64，当作 ntfy 消息正文 POST 到 `https://ntfy.sh/<话题>`。空正文、超长、公钥不对都会拒绝。
 
 ## 进 Kaneo 的做法
 
@@ -18,13 +20,11 @@
 
 脚本每次跑都会看 Kaneo 里已有任务的描述。第一行是 `yuyue-feedback-issue:<编号>` 的，跳过。所以重复运行不会造出两张一样的任务。删掉某张任务之后，下次会再导入那一条。
 
-## 隐私
+## 隐私和长度
 
-不点「发送」，什么都不会离开这台设备。发出去的只有这段话、可选的联系方式、应用版本、平台和系统版本。不带书、笔记，也没有能认出这台设备的信息。
+发出去的应当只有这段话、可选的联系方式、应用版本、平台和系统版本。不带书、笔记，也没有能认出这台设备的信息。core 里的 `FeedbackDraft` 就只有这些字段。
 
-客户端限制：正文最多 800 字，联系方式最多 80 字，24 小时最多 5 条。超长或解不开的消息，中转脚本直接跳过。
-
-没网时，这条已经加密的内容留在本机，下次打开语阅会再试。在发出去之前不用再点一次。
+core 卡的是长度：正文最多 800 字，联系方式最多 80 字，封出来的 `v1.` 消息不超过 4096 字节。24 小时 5 条、没网先留在本机，是界面侧的事，这次没有做。中转脚本对解不开或格式不对的消息直接跳过。
 
 ## 你要做的事
 
@@ -88,7 +88,7 @@ topic=上面的话题
 publicKey=上面的公钥
 ```
 
-没配的构建里，反馈页会写「这个版本还没接上反馈」，发送按钮不可用。
+没填的时候这两项是空字符串。界面自己判断：空的就不发送。这次没有反馈页。
 
 ### 5. 编译
 
@@ -144,15 +144,11 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/app.yuyue.feedback-kaneo
 
 ### 8. 对一下
 
-App 里还没有发送按钮。要先打通中转，可以用 `keygen.py` 的公钥在本机封一条 `v1.` 开头的 sealed box，POST 到 `https://ntfy.sh/<话题>`，再手动跑一次工作流。私有仓库里应出现一个 Issue，正文第一行是 `<!-- ntfy-id: … -->`。再跑导入脚本，Kaneo 里出现一张任务，描述以 `yuyue-feedback-issue:` 开头。再跑一次，不应该多出一张。
+这次没有发送按钮。要先打通中转，用 `keygen.py` 的公钥在本机封一条 `v1.` 开头的 sealed box，POST 到 `https://ntfy.sh/<话题>`，再手动跑一次工作流。私有仓库里应出现一个 Issue，正文第一行是 `<!-- ntfy-id: … -->`。再跑导入脚本，Kaneo 里出现一张任务，描述以 `yuyue-feedback-issue:` 开头。再跑一次，不应该多出一张。
 
-界面进 App 之后，用真机发一条，走同一条路。
+## 界面不在这次里
 
-## 提议的入口（原型，还没进 App）
-
-早期希望反馈在主界面上就看得见，不藏在设置深处。稿在 [`docs/dev/feedback-prototype/index.html`](feedback-prototype/index.html)。定稿后再写进 SwiftUI / Compose，并用一个开关以后收起来。
-
-稿里的摆法：
+SwiftUI / Compose 的反馈界面你自己做。参照是 [`docs/dev/feedback-prototype/index.html`](feedback-prototype/index.html)（打开即可看各屏）。稿里的摆法：
 
 - iPhone / iPad：每个主标签底部、标签栏上方有一颗「反馈」。阅读是盖在上面的全屏页，这颗按钮不压在书页上。阅读页只在顶栏出现时放一个气泡。
 - Android：标签栏上方同样有一颗「反馈」。阅读顶栏里放按钮，顶栏收起时按钮一起收起。
@@ -164,4 +160,4 @@ App 里还没有发送按钮。要先打通中转，可以用 `keygen.py` 的公
 
 - ntfy.sh 大约每 IP 每天 250 条，消息大约留 12 小时。工作流停太久，中间的反馈会丢。
 - 正文上限是为了塞进 ntfy 的大约 4096 字节。中文按 800 字留了余量。
-- 公开构建如果没配话题和公钥，反馈页在，但发不出去。
+- 公开构建默认没有话题和公钥。这两项在本地配置文件里，不进仓库。

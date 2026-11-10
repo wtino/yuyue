@@ -37,7 +37,7 @@ shared/     各平台共用的资源
 fixtures/   测试用的数据
 scripts/    开发用的小脚本
 docs/dev/   给开发看的约定，比如书页和原生之间怎么通信
-feedback/   反馈怎么从 App 送到本机 Kaneo（说明在 docs/dev/feedback.md）
+feedback/   反馈中转脚本。说明在 docs/dev/feedback.md；界面不在这次，稿在 docs/dev/feedback-prototype/
 web/        官网
 ```
 
