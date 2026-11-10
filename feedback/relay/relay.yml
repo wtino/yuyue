@@ -1,0 +1,38 @@
+# 复制到私有仓库的 .github/workflows/relay.yml
+# 公开的语阅仓库不要放这份工作流：这里没有密钥，跑了只会失败。
+#
+# 每小时一次。一次大约不到一分钟，一个月远低于私有仓库 2000 分钟的免费额度。
+# ntfy.sh 只留大约 12 小时的消息，间隔不要改得比这更稀。
+# 想少花分钟，可以把 cron 改成 "17 */3 * * *"（每 3 小时），仍然盖得住 12 小时缓存。
+name: 转发反馈
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: feedback-relay
+  cancel-in-progress: false
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 安装解密库
+        run: pip install -r feedback/relay/requirements.txt
+      - name: 拉取 ntfy 并开 Issue
+        run: python feedback/relay/relay.py
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          FEEDBACK_PRIVATE_KEY: ${{ secrets.FEEDBACK_PRIVATE_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}

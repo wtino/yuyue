@@ -59,6 +59,9 @@ targets:
         LSApplicationCategoryType: public.app-category.books
         # 同步 · Google Drive: the iOS OAuth client of 语阅's Google Cloud project, once registered.
         YYGoogleClientID: $(GOOGLE_CLIENT_ID)
+        # 反馈: empty until Feedback.local.xcconfig fills them in. Not committed.
+        YuyueFeedbackTopic: $(YUYUE_FEEDBACK_TOPIC)
+        YuyueFeedbackPublicKey: $(YUYUE_FEEDBACK_PUBLIC_KEY)
         ITSAppUsesNonExemptEncryption: false
         UIBackgroundModes: [audio]
         UILaunchScreen: {}
@@ -123,6 +126,9 @@ targets:
             UTTypeConformsTo: [public.data, public.content]
             UTTypeTagSpecification:
               public.filename-extension: [azw3]
+    configFiles:
+      Debug: Config/Feedback.xcconfig
+      Release: Config/Feedback.xcconfig
     settings:
       base:
         PRODUCT_NAME: Yuyue
@@ -130,6 +136,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.yuyue.Yuyue
         # Empty until 语阅 is registered with Google; 同步 · Google Drive waits for it.
         GOOGLE_CLIENT_ID: ""
+        # Overridden by apple/Config/Feedback.local.xcconfig when it exists.
+        YUYUE_FEEDBACK_TOPIC: ""
+        YUYUE_FEEDBACK_PUBLIC_KEY: ""
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
         CODE_SIGN_STYLE: Automatic

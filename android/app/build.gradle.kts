@@ -19,6 +19,13 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
+        // 反馈. android/feedback.properties is not committed (topic + public key).
+        val feedbackFile = rootProject.file("feedback.properties")
+        val feedback = Properties()
+        if (feedbackFile.exists()) feedbackFile.inputStream().use { feedback.load(it) }
+        fun cfg(value: String) = "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+        buildConfigField("String", "FEEDBACK_TOPIC", cfg(feedback.getProperty("topic", "")))
+        buildConfigField("String", "FEEDBACK_PUBLIC_KEY", cfg(feedback.getProperty("publicKey", "")))
     }
 
     signingConfigs {
