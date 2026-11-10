@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>语阅 · 反馈原型</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #F6F5F3;
+    --card: #fff;
+    --inset: #EFEEEB;
+    --line: #E7E5E1;
+    --t1: #2A2B2E;
+    --t2: #6E6B68;
+    --t3: #8A8682;
+    --pill: #FBFAF7;
+    --pill-line: rgba(80,65,45,.16);
+    --accent: #246858;
+    --fill: #40927A;
+    --wash: #EAF4F0;
+    --edge: rgba(36,104,88,.32);
+    --danger: #C2473A;
+    --ok: #3E9B6A;
+    --paper: #fff;
+    --ink: #2A2B2E;
+    --ink2: #777571;
+    --shadow: 0 1px 2px rgba(51,46,41,.04), 0 8px 24px rgba(51,46,41,.05);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: #E7E4DE;
+    color: var(--t1);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+  header.page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 28px 8px;
+  }
+  header.page h1 { font-size: 22px; margin: 0 0 8px; letter-spacing: .02em; }
+  header.page p { margin: 0; color: var(--t2); font-size: 14px; line-height: 1.6; max-width: 640px; }
+  .board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 36px 28px;
+    padding: 28px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .shot { width: max-content; }
+  .shot > h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--t2);
+    margin: 0 0 10px 4px;
+  }
+  body.only { background: #E7E4DE; }
+  body.only header.page, body.only .shot > h2 { display: none; }
+  body.only .board { padding: 18px; }
+  body.only .shot { display: none; }
+  body.only .shot.on { display: block; }
+
+  .phone, .android {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 18px 50px rgba(51,46,41,.18), 0 0 0 .5px rgba(0,0,0,.12);
+    display: flex;
+    flex-direction: column;
+  }
+  .status {
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 22px 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .status .sys { display: flex; gap: 6px; align-items: center; color: var(--t1); }
+  .nav {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .nav .side { width: 64px; font-size: 15px; font-weight: 400; color: var(--accent); }
+  .nav .side.r { text-align: right; }
+  .nav .mid { flex: 1; text-align: center; }
+
+  .body { flex: 1; overflow: hidden; padding: 0 20px; position: relative; }
+  .big {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: .01em;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 4px 0 0;
+  }
+  .big svg { color: var(--t3); }
+  .sub { color: var(--t3); font-size: 13px; margin-top: 2px; }
+
+  .books {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 16px;
+    margin-top: 22px;
+  }
+  .book { width: 96px; }
+  .cover {
+    height: 136px;
+    border-radius: 4px 8px 8px 4px;
+    box-shadow: 0 8px 16px rgba(51,46,41,.12), inset -8px 0 12px rgba(0,0,0,.06);
+    display: flex;
+    align-items: flex-end;
+    padding: 10px;
+    color: #fff;
+    font-family: "Songti SC", "Noto Serif SC", serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .book .name { font-size: 12px; margin-top: 6px; font-weight: 600; }
+  .book .who { font-size: 10.5px; color: var(--t3); margin-top: 1px; }
+
+  .prompt {
+    margin-top: 16px;
+    background: var(--card);
+    border: .5px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+  .prompt p { margin: 0; font-size: 12.5px; line-height: 1.55; }
+  .row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+
+  .tabs {
+    height: 84px;
+    border-top: .5px solid var(--line);
+    background: rgba(246,245,243,.92);
+    display: flex;
+    padding: 6px 4px 22px;
+  }
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--t2);
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .tab.on { color: var(--fill); font-weight: 600; }
+  .dock {
+    position: absolute;
+    left: 0; right: 0; bottom: 84px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px 4px;
+    pointer-events: none;
+  }
+  .android .tabs { height: 72px; padding-bottom: 10px; background: rgba(246,245,243,.96); }
+  .android .dock { bottom: 72px; }
+
+  .chip, .btn, .seg button, .tool, .menu-item { font-family: inherit; }
+  .chip {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: var(--pill);
+    border: .5px solid var(--pill-line);
+    color: var(--t1);
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 1px 2px rgba(51,46,41,.04);
+  }
+  .btn {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: .5px solid transparent;
+    background: transparent;
+    color: var(--t1);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .btn.main {
+    background: var(--wash);
+    color: var(--accent);
+    border-color: var(--edge);
+    font-weight: 600;
+  }
+  .btn.wide { width: 100%; height: 38px; font-size: 13.5px; margin-top: 16px; }
+  .btn:disabled, .btn.busy { opacity: .55; }
+
+  .note {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 12px 14px;
+    color: var(--t2);
+    font-size: 12px;
+    line-height: 1.55;
+    box-shadow: 0 0 0 .5px var(--line);
+  }
+  .label {
+    font-size: 12.5px;
+    font-weight: 600;
+    margin: 14px 2px 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .label span { color: var(--t3); font-weight: 400; font-size: 10.5px; }
+  .seg {
+    display: flex;
+    background: var(--inset);
+    border-radius: 12px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .seg i {
+    flex: 1;
+    text-align: center;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 9px;
+    color: var(--t2);
+    font-size: 11px;
+    font-style: normal;
+  }
+  .seg i.on {
+    background: var(--card);
+    color: var(--t1);
+    font-weight: 600;
+    box-shadow: 0 1px 1.5px rgba(0,0,0,.07);
+  }
+  .field {
+    background: var(--card);
+    border-radius: 16px;
+    min-height: 120px;
+    padding: 12px 14px;
+    box-shadow: 0 0 0 .5px var(--line);
+    color: var(--t1);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .field.ph { color: var(--t3); }
+  .field.one { min-height: 0; display: flex; gap: 8px; align-items: center; }
+  .field.one b { color: var(--t2); font-weight: 400; font-size: 11px; width: 64px; }
+  .fine { color: var(--t3); font-size: 10.5px; line-height: 1.5; margin: 8px 4px 0; }
+  .status-line { font-size: 12px; margin: 10px 4px 0; line-height: 1.5; }
+  .status-line.ok { color: var(--t2); }
+  .status-line.bad { color: var(--danger); }
+
+  .reader { background: var(--paper); }
+  .reader .status, .reader .paper-top { background: linear-gradient(#fff 70%, rgba(255,255,255,0)); }
+  .glass {
+    background: rgba(255,255,255,.86);
+    border: .5px solid rgba(0,0,0,.06);
+    box-shadow: 0 8px 20px rgba(51,46,41,.08);
+  }
+  .topbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 0 12px;
+  }
+  .round {
+    width: 40px; height: 40px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .titlepill {
+    flex: 1; height: 40px; border-radius: 999px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .titlepill b { font-size: 13px; }
+  .titlepill small { color: var(--ink2); font-size: 11px; }
+  .tools { height: 40px; border-radius: 999px; display: flex; padding: 0 4px; }
+  .tools span, .hi {
+    width: 34px; display: flex; align-items: center; justify-content: center;
+  }
+  .hi { color: var(--accent); }
+  .page-text {
+    padding: 28px 26px 0;
+    font-size: 16px;
+    line-height: 2.05;
+    letter-spacing: .02em;
+    text-align: justify;
+  }
+  .page-text h3 { font-size: 22px; margin: 8px 0 10px; letter-spacing: .04em; }
+  .capsule {
+    position: absolute; left: 16px; right: 16px; bottom: 28px;
+    height: 50px; border-radius: 999px;
+    display: flex; align-items: center; padding: 0 8px; gap: 4px;
+  }
+  .cap-mid { flex: 1; padding-left: 4px; }
+  .cap-mid b { display: block; font-size: 12px; }
+  .cap-mid small { color: var(--ink2); font-size: 10.5px; }
+
+  .group { background: var(--card); border-radius: 16px; box-shadow: 0 0 0 .5px var(--line); margin-top: 10px; }
+  .setrow {
+    min-height: 44px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 14px;
+    font-size: 15px;
+  }
+  .setrow + .setrow { box-shadow: inset 0 .5px 0 var(--line); }
+  .setrow .v { margin-left: auto; color: var(--t3); font-size: 13px; }
+  .chev { color: var(--t3); }
+
+  .mac {
+    width: 980px;
+    background: #E4E1DB;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(51,46,41,.18), 0 0 0 .5px rgba(0,0,0,.15);
+  }
+  .menubar {
+    height: 28px;
+    background: rgba(246,245,243,.92);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 16px;
+    font-size: 13px;
+    position: relative;
+  }
+  .menubar b { font-weight: 600; }
+  .menubar .apple { font-size: 15px; }
+  .help { position: relative; font-weight: 600; }
+  .menu {
+    position: absolute;
+    top: 18px; left: 0;
+    width: 220px;
+    background: rgba(255,255,255,.94);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(51,46,41,.16), 0 0 0 .5px rgba(0,0,0,.08);
+    padding: 4px;
+    z-index: 2;
+  }
+  .menu div {
+    height: 26px;
+    display: flex; align-items: center;
+    padding: 0 10px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .menu div.on { background: var(--accent); color: #fff; }
+  .macwin { display: flex; height: 560px; position: relative; }
+  .side {
+    width: 212px;
+    padding: 16px 10px 8px;
+    display: flex; flex-direction: column;
+  }
+  .lights { display: flex; gap: 6px; padding: 4px 8px 12px; }
+  .lights i { width: 12px; height: 12px; border-radius: 99px; display: block; }
+  .lights i:nth-child(1) { background: #FF5F57; }
+  .lights i:nth-child(2) { background: #FEBC2E; }
+  .lights i:nth-child(3) { background: #28C840; }
+  .search {
+    height: 30px; border-radius: 9px; background: rgba(255,255,255,.55);
+    color: var(--t2); font-size: 12px;
+    display: flex; align-items: center; gap: 6px; padding: 0 9px;
+  }
+  .search em { margin-left: auto; color: var(--t3); font-style: normal; font-size: 10.5px; }
+  .grp { color: var(--t3); font-size: 11px; margin: 14px 8px 4px; }
+  .srow {
+    height: 28px; border-radius: 7px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 8px; font-size: 13px; color: var(--t1);
+  }
+  .srow.on { background: #fff; font-weight: 600; box-shadow: 0 1px 2px rgba(51,46,41,.06); }
+  .srow .n { margin-left: auto; color: var(--t3); font-size: 12px; font-weight: 400; }
+  .side .chip { margin-top: auto; align-self: flex-start; margin-left: 4px; }
+  .sheet {
+    flex: 1;
+    margin: 8px 8px 8px 0;
+    background: var(--bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(51,46,41,.06);
+    padding: 8px 22px 16px;
+    overflow: hidden;
+  }
+  .sheet-h {
+    height: 60px;
+    display: flex; align-items: center;
+  }
+  .sheet-h h3 { margin: 0; font-size: 22px; }
+  .sheet-h .actions { margin-left: auto; display: flex; gap: 8px; }
+  .macbooks { display: flex; gap: 18px; margin-top: 8px; }
+  .settings .side { background: transparent; }
+  .settings .sheet { padding-top: 18px; }
+  .settings .sheet h3 { margin: 0; font-size: 16px; }
+  .settings .sheet .sum { color: var(--t2); font-size: 12px; margin: 2px 0 14px; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>语阅 · 反馈原型</h1>
+  <p>还没写进 App。颜色、字和圆角跟 <code>design/tokens.json</code> 里的浅色和默认松绿一致。看完再说要不要收进 SwiftUI 和 Compose。</p>
+</header>
+<div class="board">
+
+<section class="shot" id="iphone-main">
+  <h2>iPhone · 书架，标签栏上方的反馈</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="body">
+      <div class="big">书架 <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="books">
+        <div class="book"><div class="cover" style="background:#3E4F63">背影</div><div class="name">背影</div><div class="who">朱自清</div></div>
+        <div class="book"><div class="cover" style="background:#6E5344">活着</div><div class="name">活着</div><div class="who">余华</div></div>
+        <div class="book"><div class="cover" style="background:#2F4A42">边城</div><div class="name">边城</div><div class="who">沈从文</div></div>
+      </div>
+    </div>
+    <div class="dock"><span class="chip"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 3.5h10v6.2H6.2L3.4 12V9.7H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>反馈</span></div>
+    <div class="tabs">
+      <div class="tab on"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h7v14H4zM13 5h7v14h-7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>书架</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>笔记</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 19c1.2-2.4 3.2-3.5 6-3.5S16.8 16.6 18 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>我的</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>搜索</div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="iphone-prompt">
+  <h2>iPhone · 第一次的邀请，不挡书架</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="body">
+      <div class="big">书架 <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="prompt">
+        <p>语阅还在早期。读着不顺，或者想要一个功能，点反馈告诉开发者。</p>
+        <div class="row">
+          <button class="btn main">去反馈</button>
+          <button class="btn">知道了</button>
+        </div>
+      </div>
+      <div class="books">
+        <div class="book"><div class="cover" style="background:#3E4F63">背影</div><div class="name">背影</div><div class="who">朱自清</div></div>
+        <div class="book"><div class="cover" style="background:#6E5344">活着</div><div class="name">活着</div><div class="who">余华</div></div>
+      </div>
+    </div>
+    <div class="dock"><span class="chip"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 3.5h10v6.2H6.2L3.4 12V9.7H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>反馈</span></div>
+    <div class="tabs">
+      <div class="tab on"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h7v14H4zM13 5h7v14h-7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>书架</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>笔记</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 19c1.2-2.4 3.2-3.5 6-3.5S16.8 16.6 18 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>我的</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>搜索</div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="iphone-reader">
+  <h2>iPhone · 阅读顶栏，不压在字上</h2>
+  <div class="phone reader">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="paper-top">
+      <div class="topbar">
+        <div class="round glass"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <div class="titlepill glass"><b>背影</b><small>第二章 · 第 12 页</small></div>
+        <div class="tools glass">
+          <span class="hi" title="反馈"><svg width="16" height="16" viewBox="0 0 14 14"><path d="M2 3.5h10v6.2H6.2L3.4 12V9.7H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span>
+          <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+          <span><svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 3h6l2 2v8H4z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span>
+        </div>
+      </div>
+    </div>
+    <div class="page-text">
+      <h3>背影</h3>
+      我与父亲不相见已二年余了，我最不能忘记的是他的背影。那年冬天，祖母死了，父亲的差使也交卸了，正是祸不单行的日子。
+    </div>
+    <div class="capsule glass">
+      <span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M4 4h10M4 9h10M4 14h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+      <div class="cap-mid"><b>第二章</b><small>第 4 / 24 句</small></div>
+      <span><svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l6 4-6 4z" fill="currentColor"/></svg></span>
+      <span>Aa</span>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="form-empty">
+  <h2>反馈表单 · 空</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="nav"><div class="side">关闭</div><div class="mid">反馈</div><div class="side r"></div></div>
+    <div class="body">
+      <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。不会附带你的书和笔记，也没有能认出这台设备的信息。</div>
+      <div class="label">类别</div>
+      <div class="seg"><i class="on">问题</i><i>建议</i><i>其他</i></div>
+      <div class="label">想说的</div>
+      <div class="field ph">遇到的问题，或想说的建议</div>
+      <div class="field one" style="margin-top:10px"><b>联系方式</b><span style="color:var(--t3)">可选，方便回复</span></div>
+      <div class="fine">会一并带上版本 0.1.0 (1) 和系统版本，不带书名。</div>
+      <button class="btn main wide">发送</button>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="form-filled">
+  <h2>反馈表单 · 已填写</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="nav"><div class="side">关闭</div><div class="mid">反馈</div><div class="side r"></div></div>
+    <div class="body">
+      <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。不会附带你的书和笔记，也没有能认出这台设备的信息。</div>
+      <div class="label">类别</div>
+      <div class="seg"><i>问题</i><i class="on">建议</i><i>其他</i></div>
+      <div class="label">想说的 <span>18/800</span></div>
+      <div class="field">翻页时偶尔会跳回上一页，想要一个能记住上次位置的开关。</div>
+      <div class="field one" style="margin-top:10px"><b>联系方式</b><span>reader@example.com</span></div>
+      <div class="fine">会一并带上版本 0.1.0 (1) 和系统版本，不带书名。</div>
+      <button class="btn main wide">发送</button>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="form-sending">
+  <h2>反馈表单 · 正在发送</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="nav"><div class="side">关闭</div><div class="mid">反馈</div><div class="side r"></div></div>
+    <div class="body">
+      <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。不会附带你的书和笔记，也没有能认出这台设备的信息。</div>
+      <div class="label">类别</div>
+      <div class="seg"><i>问题</i><i class="on">建议</i><i>其他</i></div>
+      <div class="label">想说的 <span>18/800</span></div>
+      <div class="field">翻页时偶尔会跳回上一页，想要一个能记住上次位置的开关。</div>
+      <div class="field one" style="margin-top:10px"><b>联系方式</b><span>reader@example.com</span></div>
+      <div class="fine">会一并带上版本 0.1.0 (1) 和系统版本，不带书名。</div>
+      <button class="btn main wide busy" disabled>正在发送…</button>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="form-success">
+  <h2>反馈表单 · 已发送</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="nav"><div class="side">关闭</div><div class="mid">反馈</div><div class="side r"></div></div>
+    <div class="body">
+      <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。不会附带你的书和笔记，也没有能认出这台设备的信息。</div>
+      <div class="label">类别</div>
+      <div class="seg"><i class="on">问题</i><i>建议</i><i>其他</i></div>
+      <div class="label">想说的</div>
+      <div class="field ph">遇到的问题，或想说的建议</div>
+      <div class="field one" style="margin-top:10px"><b>联系方式</b><span style="color:var(--t3)">可选，方便回复</span></div>
+      <div class="fine">会一并带上版本 0.1.0 (1) 和系统版本，不带书名。</div>
+      <button class="btn main wide">发送</button>
+      <div class="status-line ok">已发送。谢谢。</div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="form-offline">
+  <h2>反馈表单 · 没网，留在这台设备</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys" style="color:var(--t3)">无网络</span></div>
+    <div class="nav"><div class="side">关闭</div><div class="mid">反馈</div><div class="side r"></div></div>
+    <div class="body">
+      <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。不会附带你的书和笔记，也没有能认出这台设备的信息。</div>
+      <div class="label">类别</div>
+      <div class="seg"><i class="on">问题</i><i>建议</i><i>其他</i></div>
+      <div class="label">想说的</div>
+      <div class="field ph">遇到的问题，或想说的建议</div>
+      <div class="fine">会一并带上版本 0.1.0 (1) 和系统版本，不带书名。</div>
+      <div class="fine">还有 1 条留在这台设备上，联网后会发出。</div>
+      <button class="btn main wide">发送</button>
+      <div class="status-line bad">没发出去，已留在这台设备上。联网后会自动再试，不用再点一次。</div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="iphone-settings">
+  <h2>iPhone · 我的里的反馈</h2>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="sys">●●● ▮</span></div>
+    <div class="body">
+      <div class="big" style="margin-bottom:16px">我的</div>
+      <div class="group">
+        <div class="setrow"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 8a6 6 0 1 0 1.2-3.6" fill="none" stroke="#6E6B68" stroke-width="1.3"/><path d="M2 2v3h3" fill="none" stroke="#6E6B68" stroke-width="1.3"/></svg>同步<span class="v">没开</span><span class="chev">›</span></div>
+        <div class="setrow"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="none" stroke="#6E6B68" stroke-width="1.3"/></svg>外观<span class="v">跟随系统 · 松绿</span><span class="chev">›</span></div>
+      </div>
+      <div class="group">
+        <div class="setrow"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12v7H7L4 14V11H2z" fill="none" stroke="#246858" stroke-width="1.3"/></svg>反馈<span class="chev">›</span></div>
+        <div class="setrow"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#6E6B68" stroke-width="1.3"/><path d="M8 7v4M8 5h.01" stroke="#6E6B68" stroke-width="1.3" stroke-linecap="round"/></svg>关于<span class="v">0.1.0</span><span class="chev">›</span></div>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h7v14H4zM13 5h7v14h-7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>书架</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>笔记</div>
+      <div class="tab on"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 19c1.2-2.4 3.2-3.5 6-3.5S16.8 16.6 18 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>我的</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>搜索</div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="mac-window">
+  <h2>Mac · 书架窗口上的反馈</h2>
+  <div class="mac">
+    <div class="menubar"><span class="apple"></span><b>语阅</b><span>文件</span><span>编辑</span><span>阅读</span><span>听书</span><span>窗口</span><span>帮助</span></div>
+    <div class="macwin">
+      <div class="side">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="search"><svg width="12" height="12" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.3"/></svg>搜索 · 问<em>⌘K</em></div>
+        <div class="grp">资料库</div>
+        <div class="srow on">全部<span class="n">12</span></div>
+        <div class="srow">书<span class="n">9</span></div>
+        <div class="srow">播客<span class="n">2</span></div>
+        <div class="srow">有声<span class="n">1</span></div>
+        <span class="chip"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 3.5h10v6.2H6.2L3.4 12V9.7H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>反馈</span>
+      </div>
+      <div class="sheet">
+        <div class="sheet-h">
+          <h3>书架</h3>
+          <div class="actions">
+            <span class="chip"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 3.5h10v6.2H6.2L3.4 12V9.7H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>反馈</span>
+            <span class="chip"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>导入</span>
+          </div>
+        </div>
+        <div class="prompt" style="margin-top:0">
+          <p>语阅还在早期。读着不顺，或者想要一个功能，点反馈告诉开发者。</p>
+          <div class="row"><button class="btn main">去反馈</button><button class="btn">知道了</button></div>
+        </div>
+        <div class="macbooks">
+          <div class="book"><div class="cover" style="background:#3E4F63;height:120px;width:84px">背影</div><div class="name">背影</div></div>
+          <div class="book"><div class="cover" style="background:#6E5344;height:120px;width:84px">活着</div><div class="name">活着</div></div>
+          <div class="book"><div class="cover" style="background:#2F4A42;height:120px;width:84px">边城</div><div class="name">边城</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="mac-help">
+  <h2>Mac · 帮助菜单</h2>
+  <div class="mac">
+    <div class="menubar">
+      <span class="apple"></span><b>语阅</b><span>文件</span><span>编辑</span><span>阅读</span><span>听书</span><span>窗口</span><span class="help">帮助
+        <div class="menu">
+          <div>语阅帮助</div>
+          <div class="on">给语阅反馈…</div>
+        </div>
+      </span>
+    </div>
+    <div class="macwin">
+      <div class="side">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="search">搜索 · 问<em>⌘K</em></div>
+        <div class="grp">资料库</div>
+        <div class="srow on">全部<span class="n">12</span></div>
+        <div class="srow">书<span class="n">9</span></div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-h"><h3>书架</h3></div>
+        <p style="color:var(--t2);font-size:13px;margin-top:8px">帮助菜单在每个窗口都在。点「给语阅反馈…」打开同一张表单。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="mac-settings">
+  <h2>Mac · 设置里的反馈</h2>
+  <div class="mac settings">
+    <div class="menubar"><b>语阅</b><span>设置</span></div>
+    <div class="macwin">
+      <div class="side">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="grp">这台 Mac</div>
+        <div class="srow">存储</div>
+        <div class="srow">数据</div>
+        <div class="srow on">反馈</div>
+      </div>
+      <div class="sheet">
+        <h3>反馈</h3>
+        <div class="sum">写给开发者。点发送才会离开这台设备。</div>
+        <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。</div>
+        <div class="label">类别</div>
+        <div class="seg" style="max-width:360px"><i class="on">问题</i><i>建议</i><i>其他</i></div>
+        <div class="label">想说的</div>
+        <div class="field ph" style="max-width:520px">遇到的问题，或想说的建议</div>
+        <button class="btn main" style="margin-top:16px;height:32px;padding:0 18px">发送</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="android-main">
+  <h2>Android · 书架，标签栏上方的反馈</h2>
+  <div class="android phone">
+    <div class="status"><span>9:41</span><span class="sys">●● LTE ▮</span></div>
+    <div class="body">
+      <div class="big">书架 <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="books">
+        <div class="book"><div class="cover" style="background:#3E4F63">背影</div><div class="name">背影</div><div class="who">朱自清</div></div>
+        <div class="book"><div class="cover" style="background:#6E5344">活着</div><div class="name">活着</div><div class="who">余华</div></div>
+        <div class="book"><div class="cover" style="background:#2F4A42">边城</div><div class="name">边城</div><div class="who">沈从文</div></div>
+      </div>
+    </div>
+    <div class="dock"><span class="chip"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 3.5h10v6.2H6.2L3.4 12V9.7H2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>反馈</span></div>
+    <div class="tabs">
+      <div class="tab on"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h7v14H4zM13 5h7v14h-7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>书架</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>笔记</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 19c1.2-2.4 3.2-3.5 6-3.5S16.8 16.6 18 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>我的</div>
+      <div class="tab"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>搜索</div>
+    </div>
+  </div>
+</section>
+
+<section class="shot" id="android-form">
+  <h2>Android · 反馈表单</h2>
+  <div class="android phone">
+    <div class="status"><span>9:41</span><span class="sys">●● LTE ▮</span></div>
+    <div class="nav"><div class="side">‹</div><div class="mid">反馈</div><div class="side r"></div></div>
+    <div class="body">
+      <div class="note">只有你点「发送」，这些字才会离开这台设备。发出去的是加密内容，别人即使订阅了通知也读不到原文。不会附带你的书和笔记，也没有能认出这台设备的信息。</div>
+      <div class="label">类别</div>
+      <div class="seg"><i class="on">问题</i><i>建议</i><i>其他</i></div>
+      <div class="label">想说的 <span>12/800</span></div>
+      <div class="field">听书时进度没有记下来。</div>
+      <div class="field one" style="margin-top:10px"><b>联系方式</b><span style="color:var(--t3)">可选，方便回复</span></div>
+      <div class="fine">会一并带上版本 0.1.0 (1) 和系统版本，不带书名。</div>
+      <button class="btn main wide">发送</button>
+    </div>
+  </div>
+</section>
+
+</div>
+<script>
+  const only = new URLSearchParams(location.search).get("only");
+  if (only) {
+    document.body.classList.add("only");
+    const el = document.getElementById(only);
+    if (el) el.classList.add("on");
+  }
+</script>
+</body>
+</html>

@@ -15,6 +15,7 @@ pub mod epub;
 pub mod error;
 pub mod export;
 pub mod feed;
+pub mod feedback;
 pub mod footnote;
 pub mod forced;
 pub mod hard;

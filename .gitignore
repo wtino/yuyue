@@ -23,6 +23,8 @@ android/.gradle/
 android/build/
 android/app/build/
 android/local.properties
+android/feedback.properties
+apple/Config/Feedback.local.xcconfig
 android/app/src/main/jniLibs/
 android/app/src/main/java/uniffi/
 android/.kotlin/
