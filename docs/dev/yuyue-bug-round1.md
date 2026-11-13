@@ -47,7 +47,7 @@
 19. 【低·已确认】搜索结果卡片里书名重复显示两遍（如 `"The Catch of the Day · The Catch of the Day"`）。
 
 ### 第七轮（Mac 书架走查）
-20. 【中·待确认】新建合集输入名字回车关闭后，合集列表仍是空的：要么创建静默失败，要么与 #16“上次快照不刷新”属同类不刷新问题，需复测。
+20. 【中·已确认】新建合集输入名字回车关闭后，合集列表仍是空的：第八轮复测确认弹窗能打开，但键盘输入未进入输入框（自动化限制），回车后列表仍空。待第三次复测（先点输入框再输）后定论。
 - 另记：右键书卡的上下文菜单两次模拟点击均未弹出（可能是自动化点击工具限制，真机人工验证）。
 
 ---
@@ -64,3 +64,38 @@
 3. 有声书播放与音文对齐界面（无音频夹具）
 4. iPhone 真机从文件导入（iOS 模拟器无法直接放入测试书）
 5. Mac/Android 大书首次打开加载表现（#6 / #15）及 Mac 书卡右键菜单
+
+---
+
+## 第八至十轮夜间复测（2026-11-13，代码未变，HEAD ae23508）
+
+### 必修项结果
+- **#18 Android 加入生词表：已修，实测通过。** 点词弹窗加入后生词表立即显示（含词性、音标、释义、原句上下文、出现次数），重启应用后仍在。
+- **#1 iOS 搜索页无搜索框：仍在。** 搜索页只有标题，无任何输入框。
+- **#9 Android 朗读声音名截断：仍在。** 30 个英文声音每行都只显示到 "English (United"。
+
+### 仍在的老问题（复测确认）
+- #2 iOS Add Provider 弹出菜单仍为空；#3 iOS 加服务商表单中英混排仍在（"Add Your Own 任何 OpenAI 兼容接口"）。
+- #5 iOS Apple Intelligence 永远"还在下载"文案仍在。
+- #7 Android 词甘仍把 "Chap 34" 的 Chap 注释为“小伙子”。
+- #11 Android 划词菜单仍显示 "Read from"。
+- #12 Android Snapshots 页仍写 "move to a new phone, or to Android"（另见 Sync 页 "Choose the same way on your iPhone and Mac"）。
+- #13 Android 远程书库副标题 "Calibre、NAS" 中英混排仍在。
+- #14 设备名原始串仍在：Android 显示 "This sdk_gphone64_x86_64"（iPhone 正常显示名字）。
+- #16 Mac 上次快照栏不刷新：已二次确认。生成快照后 Earlier snapshots 列表立即出现（11/13 18:32 · 347 bytes），右侧“上次快照”仍显示“还没生成过”。
+- #19 Android 搜索结果卡：未见书名重复两遍，本次显示为书名 · 章节，待定。
+
+### 新发现
+21. 【低·iOS·已确认】点主题色偶发退出到主屏：点外观页 Tea Brown 后应用退出到主屏（本轮又出现一次；第二次复测正常），#4 同源，仍不稳定。
+22. 【低·iOS·已确认】同步页英文界面混入中文条目“有声书录音”；同页 "Not Uploaded To Icloud" 拼写错误（应为 iCloud）。
+23. 【低·Android·已确认】朗读弹窗的睡前定时器标签截断：两处只显示 "End of"。
+24. 【低·Mac·待确认】快照时间显示与系统时间制式不一致（Earlier snapshots 显示 "11/13 18:32"，系统时间 4:32 PM），可能只是 24 小时制格式，真机留意。
+
+### 新验证通过项
+- Android 快照创建后 Earlier snapshots 列表立即刷新（Mac #16 的问题 Android 上不存在）。
+- Android 新主题色四套名字生效；iOS Appearance 页新主题名（Pine Green / Tea Brown / Moss Green / Dusk Violet）生效，新增 Liquid Glass 开关。
+- Android 生词表页今天分组、来源书、复习卡结构正常。
+- iPhone/Android About 页版本号 0.1.0(1)、反馈入口（Email the developer）正常。
+
+### 环境限制（本轮仍无法测）
+- iPhone Wi-Fi 传书：模拟器地址 192.168.2.2:8080 从沙盒不可达，网关不转发应用端口，留真机。
