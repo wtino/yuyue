@@ -100,3 +100,25 @@
 
 ### 环境限制（本轮仍无法测）
 - iPhone Wi-Fi 传书：模拟器地址 192.168.2.2:8080 从沙盒不可达，网关不转发应用端口，留真机。
+
+## 第十一轮（2026-11-14 凌晨，重装后全页走查，HEAD 2a111d1，代码未变）
+
+模拟器被平台回收后重出包（iOS c9c0f82a / Android 7d2ab562），全新安装重测。
+
+### iOS 空库与新页验证通过
+- 首启动空书架引导页正常（Import from Files / Wi-Fi Transfer / Remote Libraries 三入口）。
+- Wi-Fi Transfer 页：地址显示、Copy 按钮、浏览器示意均正常（实传仍留真机）。
+- Library Sources 列表 + Add Library 表单（OPDS/WebDAV 分段、占位符、未填时 Connect and Save 置灰）正常。
+- Storage 页：用量、Recently deleted 区、Clear Now 置灰正常。
+- Snapshots 页：Create/Import Snapshot、导出阅读历史入口正常。
+- Note Export 页：Obsidian/Notion/flomo 三组表单与说明正常。
+- Engine 页：Companion Provider 下拉、Manage Providers、System voices / System Translation 选中态、Saved Answers 清除置灰正常；Apple Intelligence 提示文案正确。
+- Read Aloud 设置页：速度滑杆、中文 2 声音 / 英文 16 声音分组正常。
+- Notes 空态（All/Thoughts/Words + By time/By book 筛选）正常。
+
+### 新发现（小问题）
+- #25 iOS Snapshots 页 "Export Reading History" 行文字截断（"Export Reading Hi…" / "Goodreads、Story…"），且英文文案里出现全角顿号"、"（Goodreads、StoryGraph），与其他页面的英文逗号不一致。截断与 #9/#23 同类。
+- #26 iOS Engine 页 Companion 状态提示 "Apple Intelligence is still downloading its model." 也被截断（"downloa…"），同 #25 一类。
+
+### 待测（书导入后）
+- iOS 有书后的搜索页（空库时搜索页只有标题，无输入框也无空态提示，待有书后确认是否恢复输入框）；Android 导入 → 阅读器内划词/翻译/朗读/睡前定时器回归。
