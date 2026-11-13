@@ -122,3 +122,18 @@
 
 ### 待测（书导入后）
 - iOS 有书后的搜索页（空库时搜索页只有标题，无输入框也无空态提示，待有书后确认是否恢复输入框）；Android 导入 → 阅读器内划词/翻译/朗读/睡前定时器回归。
+
+## 第十二轮（2026-11-14 凌晨，Android 全链路带书回归，build 7d2ab562，HEAD 2a111d1）
+
+### 验证通过
+- 系统文件选择器导入《Pride and Prejudice》成功，书架即时显示、状态标签正常。
+- 阅读器：深色纸即时切换、词条音注（悬求/药剂师）、四色高亮含词纹、选中菜单（想法/朗读起点/问/翻译/拷贝/分享）、朗读卡拉OK下划线逐句推进、切页签后底部迷你播放条继续播、Notes 页高亮即时入库 + Today's Review 卡。深色模式下 Me/Sync/阅读统计/Library Sources/E-ink/排版面板均正常，Android Sync 页干净（iOS #22 混入问题 Android 没有）。
+- 空库引导页、导入页、搜索/笔记空态正常。
+
+### 仍问题
+- #9 复确认：Android 朗读声音行整行只显示 "English (United"，声音名完全没显示（本次为全新安装重装后）。
+- 新发现 #27【中】阅读器选中文本点"翻译"：只弹出词头读音条（黄字词 + 播放/暂停），无任何翻译内容，读音结束自动收起。离线翻译引擎显示可用。复现：长按词 → Translate。需确认词典/翻译面板数据流。
+- 新发现 #28【低】空库引导页 Remote 卡文案 "Calibre、 NAS"（全角顿号+多余空格）；Wi-Fi Transfer 卡副标题 "Send from a computer's" 被裁（无省略号）。
+- 新发现 #29【低】排版面板纸质主题 chip 截断："Paper ·"、"Lette"（无省略号），行距 "Medium line spacing" chip 文字贴边裁切。
+- #25 同源：iOS Snapshots "Export Reading History" 行截断 + "Goodreads、StoryGraph" 全角顿号；Engine 页 Apple Intelligence 提示截断。
+- 观察项：空库时搜索页只有标题无输入框（待有书确认）；预览示例句拼接生硬（"acknowledged,Heaven always leaves a way out!"），双语混排无空格。
