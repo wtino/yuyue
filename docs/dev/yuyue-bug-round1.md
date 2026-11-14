@@ -137,3 +137,24 @@
 - 新发现 #29【低】排版面板纸质主题 chip 截断："Paper ·"、"Lette"（无省略号），行距 "Medium line spacing" chip 文字贴边裁切。
 - #25 同源：iOS Snapshots "Export Reading History" 行截断 + "Goodreads、StoryGraph" 全角顿号；Engine 页 Apple Intelligence 提示截断。
 - 观察项：空库时搜索页只有标题无输入框（待有书确认）；预览示例句拼接生硬（"acknowledged,Heaven always leaves a way out!"），双语混排无空格。
+
+## 第十三轮（2026-11-14，iPhone Duo 三态加测，iOS build 1a3eb247 / Android 26975d5c，HEAD 8969ba0）
+- 无新代码提交（HEAD 8969ba0 全是测试文档），双平台重新打包并装机启动正常。
+- iPhone Duo：展开全屏、半折、合盖外屏三态自适应正常；半折时内容横排 + 右侧页签栏可用；合盖外屏布局正常。
+- 新发现（#28 同类，低）：Duo 半折态下卡片副标题同样省略号截断。
+- 测试注：折叠姿态截图默认旋转，用 screenshot --upright 输出正立图（点按坐标仍按普通截图计）。
+
+## 第十四轮（2026-11-14 下午，Android 带书回归 + 设置页走查，build 7ba2257b，HEAD 8969ba0 无新提交）
+### 验证通过
+- 模拟器被回收后 APK 重装、书重新推送（base64 分块 561102 字节校验一致）、系统选择器再次导入成功，书架即时显示（Continue + Listening 角标、进度 4%）。
+- 目录面板：Contents / Bookmarks / Notes 页签、每章阅读/听书时长估算正常；点 Chapter I 跳转成功，返回原位置的浮层正常。
+- 排版面板字号滑杆增大后正文即时重排，页码/进度同步。
+- 朗读：播放/暂停、卡拉OK下划线逐句推进、点进度条跳句正常。
+- Me 各子页全走查：Languages（MDict 导入、CET-6 词条预览正常）、Read Aloud（速度滑杆、17 个英文声音 + Premium 标签、Cloud Voices 三组 Key 输入）、Storage（4.2 MB 用量/8 GB 可用分布正常）、Snapshots（新建快照成功，1.1 kB，分享/导出/删除按钮在）、Note Export（Obsidian/Notion/flomo 三组表单与说明完整）、Engine（Companion Add Provider / System voices / 系统翻译三区正常）、Focus Reading（六个开关分组与免打扰提示正常）。
+
+### 仍问题 / 新发现
+- #9 复确认：Read Aloud 声音行仍整行只显示 "English (United"（10 行英文声音全部如此，声音名与地区完全不可见）。
+- #29 复确认：排版面板 "Paper ·"、"Lette" 截断仍在。
+- 新发现 #30【低】导入成功的 snackbar 右侧出现红色数字角标"2"（第二次导入时出现），含义不明，疑似未读计数错挂在 snackbar 上。
+- 观察：Me 页从子页返回时滚动位置行为不一致（四次中两次回到顶部、两次保留），自动化点按需每次重截图定位；真机上手动使用影响小。
+- 睡前定时器（#23）本轮未复测：定时器入口在有声书播放器内，Android 模拟器无音频书 fixture，留真机。
